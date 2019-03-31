@@ -1,0 +1,31 @@
+g++ sorteador.cpp -o sort -O2 -std=c++11 -Wall -Wextra -Wpedantic
+./sort -e avaliadores.psger -c candidatos_ra.psger -r 3
+Albert:
+123456
+654321
+313131
+999999
+666666
+424242
+Newton:
+654321
+131313
+666666
+Kepler:
+123456
+654321
+313131
+999999
+666666
+000000
+424242
+Gauss:
+123456
+131313
+999999
+000000
+Euler:
+131313
+313131
+000000
+424242
