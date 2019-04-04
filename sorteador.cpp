@@ -8,16 +8,28 @@
 
 #define MAXLINE 256
 
-int main(int argc, char *argv[]) {
+/**
+ * @brief Sorts evaluators assigned to competitors
+ * 
+ * @param argc 
+ * @param argv 
+ * @return int 
+ */
 
-	if (argc < 5) {
-		std::cerr 	<< "usage:" << std::endl;
-		std::cerr 	<< "./sort "
-					<< "<--evaluators | -e> <file> "
-					<< "<--competitors | -c> <file> "
-					<< "[--ratio | -r <int>]" << std::endl << std::endl;
-		std::cerr	<< "Files must be one name per line, ended on \\n" << std::endl;
-		std::cerr	<< "Ratio must be #evaluators assigned to each competitor (default=1)" << std::endl;
+int main(int argc, char *argv[])
+{
+
+	if (argc < 5)
+	{
+		std::cerr << "usage:" << std::endl;
+		std::cerr << "./sort "
+				  << "<--evaluators | -e> <file> "
+				  << "<--competitors | -c> <file> "
+				  << "[--ratio | -r <int>]" << std::endl
+				  << std::endl;
+		std::cerr << "Files must be one name per line, ended on \\n"
+				  << std::endl;
+		std::cerr << "Ratio must be #evaluators assigned to each competitor (default=1)" << std::endl;
 		return 1;
 	}
 
@@ -26,71 +38,81 @@ int main(int argc, char *argv[]) {
 	int c_index = 0;
 	size_t ratio = 1;
 
-	for (int index = 0; index < argc; index++) {	
+	for (int index = 0; index < argc; index++)
+	{
 		std::string s = argv[index];
-		if (!s.compare("-e") || !s.compare("--evaluators")) {
-			if (index+1 >= argc) {
+		if (!s.compare("-e") || !s.compare("--evaluators"))
+		{
+			if (index + 1 >= argc)
+			{
 				std::cerr << "Expected a file path" << std::endl;
 				return 3;
 			}
-			e_index = index+1;
+			e_index = index + 1;
 		}
-		else if (!s.compare("-c") || !s.compare("--competitors")) {
-			if (index+1 >= argc) {
+		else if (!s.compare("-c") || !s.compare("--competitors"))
+		{
+			if (index + 1 >= argc)
+			{
 				std::cerr << "Expected a file path" << std::endl;
 				return 3;
 			}
-			c_index = index+1;
+			c_index = index + 1;
 		}
-		else if (!s.compare("-r") || !s.compare("--ratio")) {
-			
-			if (index+1 >= argc) {
+		else if (!s.compare("-r") || !s.compare("--ratio"))
+		{
+
+			if (index + 1 >= argc)
+			{
 				std::cerr << "Expected a positive integer" << std::endl;
 				return 3;
 			}
 			// Search for a digit in sratio
-			std::string sratio = argv[index+1];
-			if ((ratio = std::stoi(sratio)) <= 0 
-				|| std::find_if(sratio.begin(), sratio.end(), [](char c){ return isdigit(c); }) > sratio.begin())
+			std::string sratio = argv[index + 1];
+			if ((ratio = std::stoi(sratio)) <= 0 || std::find_if(sratio.begin(), sratio.end(), [](char c) { return isdigit(c); }) > sratio.begin())
 			{
 				std::cerr << "Expected a valid positive integer" << std::endl;
 				return 3;
 			}
-			
 		}
 	}
-	
-	if (e_index == 0 || c_index == 0) {
+
+	if (e_index == 0 || c_index == 0)
+	{
 		std::cerr << "Expected evaluators or competitors files paths" << std::endl;
 		return 4;
 	}
-	
+
 	// Files opening
-	FILE *evaluators_file  = fopen(argv[e_index], "r+");
+	FILE *evaluators_file = fopen(argv[e_index], "r+");
 	FILE *competitors_file = fopen(argv[c_index], "r+");
-	if (evaluators_file == NULL || competitors_file == NULL) {
-		std::cerr << "Could not open " << (evaluators_file?argv[e_index]:argv[c_index]) << " files" << std::endl;
+	if (evaluators_file == NULL || competitors_file == NULL)
+	{
+		std::cerr << "Could not open " << (evaluators_file ? argv[e_index] : argv[c_index]) << " files" << std::endl;
 		return 5;
 	}
-	
+
 	// Reading files data
-	char *temp_line = (char *) malloc(MAXLINE*sizeof(char));
-	struct Evaluator {
+	char *temp_line = (char *)malloc(MAXLINE * sizeof(char));
+	struct Evaluator
+	{
 		std::string name;
 		std::vector<std::string> competitors_evaluating;
-	}; 
+	};
 
 	std::vector<Evaluator> evaluators_vector;
 	std::vector<std::string> competitors_vector;
 
-	while (fgets(temp_line, MAXLINE, evaluators_file) != NULL) {
+	while (fgets(temp_line, MAXLINE, evaluators_file) != NULL)
+	{
 		Evaluator e;
-		temp_line[strlen(temp_line)-1] = 0; // Cuts \n
+		temp_line[strlen(temp_line) - 1] = 0; // Cuts \n
 		e.name = temp_line;
 		evaluators_vector.push_back(e);
 	}
-	while (fgets(temp_line, MAXLINE, competitors_file) != NULL) {
-		temp_line[strlen(temp_line)-1] = 0; // Cuts \n
+	while (fgets(temp_line, MAXLINE, competitors_file) != NULL)
+	{
+		temp_line[strlen(temp_line) - 1] = 0; // Cuts \n
 		std::string s = temp_line;
 		competitors_vector.push_back(s);
 	}
@@ -98,40 +120,40 @@ int main(int argc, char *argv[]) {
 	fclose(evaluators_file);
 	fclose(competitors_file);
 	delete temp_line;
-	
 
 	// Sorts "ratio" evaluators for each competitor
 	std::default_random_engine generator;
-  	std::uniform_int_distribution<int> distribution(0,evaluators_vector.size()-1);
+	std::uniform_int_distribution<int> distribution(0, evaluators_vector.size() - 1);
 
-	for (size_t i = 0; i < competitors_vector.size(); i++) {
-		
-		for (size_t j = 0; j < ratio; j++) {
+	for (size_t i = 0; i < competitors_vector.size(); i++)
+	{
+
+		for (size_t j = 0; j < ratio; j++)
+		{
 			int random_index = distribution(generator);
 			// Search at evaluators[random_index] for the name of competitor
 			std::vector<std::string> &name_list = evaluators_vector[random_index].competitors_evaluating;
-			if(std::find(name_list.begin(), name_list.end(), competitors_vector[i]) != name_list.end()) {
+			if (std::find(name_list.begin(), name_list.end(), competitors_vector[i]) != name_list.end())
+			{
 				// Try another evaluator if already selected
 				j--;
 			}
-			else {
+			else
+			{
 				evaluators_vector[random_index].competitors_evaluating.push_back(competitors_vector[i]);
 			}
 		}
-		
 	}
-
 
 	// Print the result on the screen
-	for (size_t i = 0; i < evaluators_vector.size(); i++) {
+	for (size_t i = 0; i < evaluators_vector.size(); i++)
+	{
 		std::cout << evaluators_vector[i].name << ":" << std::endl;
-		for (size_t j = 0; j < evaluators_vector[i].competitors_evaluating.size(); j++) {
+		for (size_t j = 0; j < evaluators_vector[i].competitors_evaluating.size(); j++)
+		{
 			std::cout << evaluators_vector[i].competitors_evaluating[j] << std::endl;
 		}
-		
 	}
-	
-	
 
 	return 0;
 }
