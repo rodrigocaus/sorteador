@@ -121,6 +121,21 @@ int main(int argc, char *argv[])
 	fclose(competitors_file);
 	delete temp_line;
 
+	// Randomize vectors
+	
+
+	std::sort(evaluators_vector.begin(), evaluators_vector.end(), [](const Evaluator &a, const Evaluator &b) {
+		std::default_random_engine random_compare_generator;
+		std::uniform_int_distribution<int> random_compare_distribution(0, 1);
+		return (bool) random_compare_distribution(random_compare_generator);
+	});
+
+	std::sort(competitors_vector.begin(), competitors_vector.end(), [](const std::string &a, const std::string &b) {
+		std::default_random_engine random_compare_generator;
+		std::uniform_int_distribution<int> random_compare_distribution(0, 1);
+		return (bool) random_compare_distribution(random_compare_generator);
+	});
+
 	// Sorts "ratio" evaluators for each competitor
 
 	for (size_t i = 0; i < competitors_vector.size(); i++)
