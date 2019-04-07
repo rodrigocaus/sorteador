@@ -122,27 +122,28 @@ int main(int argc, char *argv[])
 	delete temp_line;
 
 	// Sorts "ratio" evaluators for each competitor
-	std::default_random_engine generator;
-	std::uniform_int_distribution<int> distribution(0, evaluators_vector.size() - 1);
 
 	for (size_t i = 0; i < competitors_vector.size(); i++)
 	{
-
+		std::vector<Evaluator> already_selected;
 		for (size_t j = 0; j < ratio; j++)
 		{
+			std::default_random_engine generator;
+			std::uniform_int_distribution<int> distribution(0, evaluators_vector.size() - 1);
 			int random_index = distribution(generator);
-			// Search at evaluators[random_index] for the name of competitor
-			std::vector<std::string> &name_list = evaluators_vector[random_index].competitors_evaluating;
-			if (std::find(name_list.begin(), name_list.end(), competitors_vector[i]) != name_list.end())
-			{
-				// Try another evaluator if already selected
-				j--;
-			}
-			else
-			{
-				evaluators_vector[random_index].competitors_evaluating.push_back(competitors_vector[i]);
-			}
+
+			evaluators_vector[random_index].competitors_evaluating.push_back(competitors_vector[i]);
+			// Copy already selected evaluators and remove from evaluators_vector
+			already_selected.push_back(evaluators_vector[random_index]);
+			evaluators_vector.erase(evaluators_vector.begin()+random_index);
 		}
+
+		for(size_t k = 0; k < already_selected.size(); k++)
+		{
+			// Restore evaluators_vector
+			evaluators_vector.push_back(already_selected[k]);
+		}
+		already_selected.clear();
 	}
 
 	// Print the result on the screen
